@@ -14,15 +14,13 @@ PACKER_VERSION="1.2.4"
 && chown -R ubuntu:ubuntu /home/ubuntu/.ssh
 
 # install packages
-if [ ${REDHAT_BASED} ] ; then
-  yum -y update
-  yum install -y docker ansible unzip wget
-else 
-  apt-get update
-  apt-get -y install docker.io ansible unzip
-fi
+add-apt-repository ppa:jonathonf/vim
+apt-get update
+apt-get -y install docker.io ansible unzip zsh vim
+
 # add docker privileges
 usermod -G docker ubuntu
+
 # install pip
 pip install -U pip && pip3 install -U pip
 if [[ $? == 127 ]]; then
@@ -30,6 +28,7 @@ if [[ $? == 127 ]]; then
     python get-pip.py
     python3 get-pip.py
 fi
+
 # install awscli and ebcli
 pip install -U awscli
 pip install -U awsebcli
@@ -51,6 +50,12 @@ P_RETVAL=$?
 && wget -q https://releases.hashicorp.com/packer/${PACKER_VERSION}/packer_${PACKER_VERSION}_linux_amd64.zip \
 && unzip -o packer_${PACKER_VERSION}_linux_amd64.zip -d /usr/local/bin \
 && rm packer_${PACKER_VERSION}_linux_amd64.zip
+
+# Configure shell
+export ZSH="/home/vagrant/.oh-my-zsh"; sh -c "$(wget --no-check-certificate https://github.com/robbyrussell/oh-my-zsh/raw/master/tools/install.sh -O - | sh)"
+git clone https://github.com/bhilburn/powerlevel9k.git /home/vagrant/.oh-my-zsh/custom/themes/powerlevel9k
+sudo chsh -s /bin/zsh vagrant
+zsh
 
 # clean up
 if [ ! ${REDHAT_BASED} ] ; then
